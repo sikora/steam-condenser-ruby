@@ -9,19 +9,21 @@ require 'steam/community/tf2/tf2_item'
 # Represents the inventory (aka. Backpack) of a Team Fortress 2 player
 #
 # @author Sebastian Staudt
-class TF2Inventory < GameInventory
+module SteamCondenser
+  class TF2Inventory < GameInventory
 
-  # Creates a new inventory object for the given SteamID64 in Team Fortress 2
-  # (App ID 440)
-  #
-  # @param [Fixnum] steam_id64 The 64bit SteamID of the player to get the
-  #        inventory for
-  # @macro cacheable
-  def initialize(steam_id64)
-    super 440, steam_id64
+    # Creates a new inventory object for the given SteamID64 in Team Fortress 2
+    # (App ID 440)
+    #
+    # @param [Fixnum] steam_id64 The 64bit SteamID of the player to get the
+    #        inventory for
+    # @macro cacheable
+    def initialize(steam_id64)
+      super 440, steam_id64
+    end
+
+    # The class representing Team Fortress 2 items
+    @@item_class = TF2Item
+
   end
-
-  # The class representing Team Fortress 2 items
-  @@item_class = TF2Item
-
 end
