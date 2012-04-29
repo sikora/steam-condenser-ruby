@@ -3,7 +3,6 @@
 #
 # Copyright (c) 2008-2012, Sebastian Staudt
 
-require 'errors/rcon_no_auth_error'
 require 'steam/packets/rcon/rcon_auth_request'
 require 'steam/packets/rcon/rcon_auth_response'
 require 'steam/packets/rcon/rcon_exec_request'
@@ -12,6 +11,7 @@ require 'steam/servers/game_server'
 require 'steam/servers/master_server'
 require 'steam/sockets/rcon_socket'
 require 'steam/sockets/source_socket'
+require 'steam-condenser/error/rcon_no_auth'
 
 module SteamCondenser
 
@@ -43,7 +43,7 @@ module SteamCondenser
     #        combined with the port number. If a port number is given, e.g.
     #        'server.example.com:27016' it will override the second argument.
     # @param [Fixnum] port The port the server is listening on
-    # @raise [SteamCondenserError] if an host name cannot be resolved
+    # @raise [Error] if an host name cannot be resolved
     def initialize(address, port = 27015)
       super
     end
@@ -79,7 +79,7 @@ module SteamCondenser
     # @return [String] The output of the executed command
     # @see #rcon_auth
     def rcon_exec(command)
-      raise RCONNoAuthError unless @rcon_authenticated
+      raise Error::RCONNoAuth unless @rcon_authenticated
 
       @rcon_socket.send RCONExecRequest.new(@rcon_request_id, command)
       @rcon_socket.send RCONTerminator.new(@rcon_request_id)
@@ -89,7 +89,7 @@ module SteamCondenser
         response_packet = @rcon_socket.reply
         if response_packet.is_a? RCONAuthResponse
           @rcon_authenticated = false
-          raise RCONNoAuthError
+          raise Error::RCONNoAuth
         end
         response << response_packet.response
       end while response.size < 3 || response_packet.response.size > 0

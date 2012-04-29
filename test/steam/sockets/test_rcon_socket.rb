@@ -61,7 +61,7 @@ class TestRCONSocket < Test::Unit::TestCase
     should 'raise a timeout if the connection cannot be established' do
       @socket.expects(:timeout).raises Timeout::Error
 
-      assert_raises SteamCondenser::TimeoutError do
+      assert_raises SteamCondenser::Error::Timeout do
         @socket.connect
       end
     end
@@ -99,7 +99,7 @@ class TestRCONSocket < Test::Unit::TestCase
     should 'raise an error if the client has been banned' do
       @socket.expects(:receive_packet).with(4).returns 0
 
-      assert_raises SteamCondenser::RCONBanError do
+      assert_raises SteamCondenser::Error::RCONBan do
         @socket.reply
       end
     end
