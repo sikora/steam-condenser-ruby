@@ -1,7 +1,7 @@
 # This code is free software; you can redistribute it and/or modify it under
 # the terms of the new BSD License.
 #
-# Copyright (c) 2008-2011, Sebastian Staudt
+# Copyright (c) 2008-2012, Sebastian Staudt
 
 require 'errors/rcon_no_auth_error'
 require 'steam/packets/rcon/rcon_auth_request'
@@ -13,16 +13,17 @@ require 'steam/servers/master_server'
 require 'steam/sockets/rcon_socket'
 require 'steam/sockets/source_socket'
 
-# This class represents a Source game server and can be used to query
-# information about and remotely execute commands via RCON on the server
-#
-# A Source game server is an instance of the Source Dedicated Server (SrcDS)
-# running games using Valve's Source engine, like Counter-Strike: Source,
-# Team Fortress 2 or Left4Dead.
-#
-# @author Sebastian Staudt
-# @see GoldSrcServer
 module SteamCondenser
+
+  # This class represents a Source game server and can be used to query
+  # information about and remotely execute commands via RCON on the server
+  #
+  # A Source game server is an instance of the Source Dedicated Server (SrcDS)
+  # running games using Valve's Source engine, like Counter-Strike: Source,
+  # Team Fortress 2 or Left4Dead.
+  #
+  # @author Sebastian Staudt
+  # @see GoldSrcServer
   class SourceServer
 
     include GameServer

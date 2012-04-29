@@ -1,17 +1,18 @@
 # This code is free software; you can redistribute it and/or modify it under
 # the terms of the new BSD License.
 #
-# Copyright (c) 2011, Sebastian Staudt
+# Copyright (c) 2011-2012, Sebastian Staudt
 
 require 'socket'
 
-# This module is included by all classes implementing server functionality
-#
-# It provides basic name resolution features and the ability to rotate between
-# different IP addresses belonging to a single DNS name.
-#
-# @author Sebastian Staudt
 module SteamCondenser
+
+  # This module is included by all classes implementing server functionality
+  #
+  # It provides basic name resolution features and the ability to rotate between
+  # different IP addresses belonging to a single DNS name.
+  #
+  # @author Sebastian Staudt
   module Server
 
     # Returns a list of host names associated with this server

@@ -6,9 +6,12 @@
 require 'steam/community/game_inventory'
 require 'steam/community/tf2/tf2_item'
 
-# Represents the inventory (aka. Backpack) of a player of the public Team
-# Fortress 2 beta
 module SteamCondenser
+
+  # Represents the inventory (aka. Backpack) of a player of the public Team
+  # Fortress 2 beta
+  #
+  # @author Sebastian Staudt
   class TF2BetaInventory < GameInventory
 
     # Creates a new inventory object for the given SteamID64 in the Team

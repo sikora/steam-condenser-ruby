@@ -7,10 +7,11 @@ require 'steam/community/cacheable'
 require 'steam/community/game_item'
 require 'steam/community/web_api'
 
-# Provides basic functionality to represent an inventory of player in a game
-#
-# @author Sebastian Staudt
 module SteamCondenser
+
+  # Provides basic functionality to represent an inventory of player in a game
+  #
+  # @author Sebastian Staudt
   class GameInventory
 
     include Cacheable
@@ -129,8 +130,8 @@ module SteamCondenser
 
     protected
 
-    # Updates the item schema (this includes attributes and qualities) using the
-    # `GetSchema` method of interface `IEconItems_[AppID]`
+    # Updates the item schema (this includes attributes and qualities) using
+    # the `GetSchema` method of interface `IEconItems_[AppID]`
     def update_schema
       params = {}
       params[:language] = @@schema_language unless @@schema_language.nil?
