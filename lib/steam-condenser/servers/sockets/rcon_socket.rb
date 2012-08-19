@@ -7,10 +7,9 @@ require 'ipaddr'
 require 'socket'
 require 'timeout'
 
-require 'steam/packets/rcon/rcon_packet'
-require 'steam/packets/rcon/rcon_packet_factory'
 require 'steam-condenser/error/rcon_ban'
 require 'steam-condenser/error/timeout'
+require 'steam-condenser/servers/packets/rcon/rcon_packet_factory'
 require 'steam-condenser/servers/sockets/base_socket'
 
 module SteamCondenser::Servers::Sockets
@@ -90,7 +89,7 @@ module SteamCondenser::Servers::Sockets
         packet_data << @buffer.get
       end while remaining_bytes > 0
 
-      SteamCondenser::RCONPacketFactory.packet_from_data(packet_data)
+      SteamCondenser::Servers::Packets::RCON::RCONPacketFactory.packet_from_data(packet_data)
     end
 
   end

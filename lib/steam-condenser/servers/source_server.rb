@@ -3,13 +3,13 @@
 #
 # Copyright (c) 2008-2012, Sebastian Staudt
 
-require 'steam/packets/rcon/rcon_auth_request'
-require 'steam/packets/rcon/rcon_auth_response'
-require 'steam/packets/rcon/rcon_exec_request'
-require 'steam/packets/rcon/rcon_terminator'
 require 'steam-condenser/error/rcon_no_auth'
 require 'steam-condenser/servers/game_server'
 require 'steam-condenser/servers/master_server'
+require 'steam-condenser/servers/packets/rcon/rcon_auth_request'
+require 'steam-condenser/servers/packets/rcon/rcon_auth_response'
+require 'steam-condenser/servers/packets/rcon/rcon_exec_request'
+require 'steam-condenser/servers/packets/rcon/rcon_terminator'
 require 'steam-condenser/servers/sockets/rcon_socket'
 require 'steam-condenser/servers/sockets/source_socket'
 
@@ -68,7 +68,7 @@ module SteamCondenser
       def rcon_auth(password)
         @rcon_request_id = rand 2**16
 
-        @rcon_socket.send RCONAuthRequest.new(@rcon_request_id, password)
+        @rcon_socket.send Packets::RCON::RCONAuthRequest.new(@rcon_request_id, password)
         @rcon_socket.reply
         reply = @rcon_socket.reply
 
@@ -83,13 +83,13 @@ module SteamCondenser
       def rcon_exec(command)
         raise SteamCondenser::Error::RCONNoAuth unless @rcon_authenticated
 
-        @rcon_socket.send RCONExecRequest.new(@rcon_request_id, command)
-        @rcon_socket.send RCONTerminator.new(@rcon_request_id)
+        @rcon_socket.send Packets::RCON::RCONExecRequest.new(@rcon_request_id, command)
+        @rcon_socket.send Packets::RCON::RCONTerminator.new(@rcon_request_id)
 
         response = []
         begin
           response_packet = @rcon_socket.reply
-          if response_packet.is_a? RCONAuthResponse
+          if response_packet.is_a? Packets::RCON::RCONAuthResponse
             @rcon_authenticated = false
             raise SteamCondenser::Error::RCONNoAuth
           end
