@@ -1,7 +1,7 @@
 # This code is free software; you can redistribute it and/or modify it under
 # the terms of the new BSD License.
 #
-# Copyright (c) 2011, Sebastian Staudt
+# Copyright (c) 2011-2012, Sebastian Staudt
 
 require 'socket'
 
@@ -51,6 +51,14 @@ module Server
     init_socket
   end
 
+
+  # Disconnect the connections to this server
+  #
+  # @note In the base implementation this does nothing, only connection-based
+  #       communication channels have to be disconnected.
+  def disconnect
+  end
+
   # Rotate this server's IP address to the next one in the IP list
   #
   # If this method returns `true`, it indicates that all IP addresses have been
@@ -90,6 +98,9 @@ module Server
       proc.call
     rescue
       raise $! if rotate_ip
+      if $DEBUG
+        puts "Request failed, retrying for #@ip_address..."
+      end
       failsafe &proc
     end
   end

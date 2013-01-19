@@ -96,11 +96,20 @@ class TestRCONSocket < Test::Unit::TestCase
       @socket.reply
     end
 
-    should 'raise an error if the client has been banned' do
-      @socket.expects(:receive_packet).with(4).returns 0
+    should 'raise an RCONBanError if the client has been banned' do
+      @socket.expects(:receive_packet).with(4).raises Errno::ECONNRESET
 
-      assert_raises RCONBanError do
-        @socket.reply
+      assert_raise RCONBanError do
+        assert_nil @socket.reply
+      end
+    end
+
+    should 'raise an RCONNoAuthError if the connection has been dropped' do
+      @socket.expects(:receive_packet).with(4).returns 0
+      @tcp_socket.expects :close
+
+      assert_raise RCONNoAuthError do
+        assert_nil @socket.reply
       end
     end
 

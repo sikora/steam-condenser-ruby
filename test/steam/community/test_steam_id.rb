@@ -10,6 +10,23 @@ class TestSteamId < Test::Unit::TestCase
 
   context 'The SteamId class' do
 
+    should 'be able to resolve vanity URLs' do
+      WebApi.expects(:json).
+        with('ISteamUser', 'ResolveVanityURL', 1, { :vanityurl => 'koraktor' }).
+        returns '{ "response": { "success": 1, "steamid": "76561197961384956" } }'
+
+      steam_id64 = SteamId.resolve_vanity_url 'koraktor'
+      assert_equal 76561197961384956, steam_id64
+    end
+
+    should 'be return nil when not able to resolve a vanity URL' do
+      WebApi.expects(:json).
+        with('ISteamUser', 'ResolveVanityURL', 1, { :vanityurl => 'unknown' }).
+        returns '{ "response": { "success": 42 } }'
+
+      assert_nil SteamId.resolve_vanity_url 'unknown'
+    end
+
     should 'provide a conversion between 64bit Steam IDs and STEAM_IDs' do
       steam_id = SteamId.convert_community_id_to_steam_id 76561197960290418
       assert_equal 'STEAM_0:0:12345', steam_id
@@ -105,6 +122,17 @@ class TestSteamId < Test::Unit::TestCase
         SteamId.new 'Son_of_Thor'
       end
       assert_equal 'XML data could not be parsed.', error.message
+    end
+    
+    should 'not cache an empty hash when an error is encountered on steam' do
+      SteamId.any_instance.expects(:parse).raises(OpenURI::HTTPError.new('', nil))
+      steam_id = SteamId.new(76561197983311154, false)
+      
+      assert_raises OpenURI::HTTPError do
+        steam_id.games
+      end
+      
+      assert_equal(nil, steam_id.instance_variable_get("@games"))
     end
 
     teardown do

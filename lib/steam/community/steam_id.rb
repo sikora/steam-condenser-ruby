@@ -31,20 +31,6 @@ class SteamId
   # @return [String] The custom URL of this Steam ID
   attr_reader :custom_url
 
-  # Returns the favorite game of this user
-  #
-  # @deprecated The favorite game is no longer listed for new users
-  # @return [String] The favorite game of this user
-  attr_reader :favorite_game
-
-  # Returns the number of hours that this user played his/her favorite game in
-  # the last two weeks
-  #
-  # @deprecated The favorite game is no longer listed for new users
-  # @return [String] The number of hours the favorite game has been played
-  #         recently
-  attr_reader :favorite_game_hours_played
-
   # Returns the groups this user is a member of
   #
   # @return [Array<SteamGroup>] The groups this user is a member of
@@ -155,6 +141,21 @@ class SteamId
     steam_id2 = (steam_id2 - steam_id1) / 2
 
     "STEAM_0:#{steam_id1}:#{steam_id2}"
+  end
+
+  # Resolves a vanity URL of a Steam Community profile to a 64bit numeric
+  # SteamID
+  #
+  # @param [String] vanity_url The vanity URL of a Steam Community profile
+  # @return [Fixnum] The 64bit numeric SteamID
+  def self.resolve_vanity_url(vanity_url)
+    params = { :vanityurl => vanity_url }
+    json = WebApi.json 'ISteamUser', 'ResolveVanityURL', 1, params
+    result = MultiJson.load(json, :symbolize_keys => true)[:response]
+
+    return nil if result[:success] != 1
+
+    result[:steamid].to_i
   end
 
   # Converts a SteamID as reported by game servers to a 64bit numeric SteamID
@@ -277,7 +278,7 @@ class SteamId
         @summary      = CGI.unescapeHTML profile['summary'] || ''
 
         @most_played_games = {}
-        if !profile['mostPlayedGames'].to_s.strip.empty?
+        unless profile['mostPlayedGames'].to_s.strip.empty?
           [profile['mostPlayedGames']['mostPlayedGame']].flatten.each do |most_played_game|
             @most_played_games[most_played_game['gameName']] = most_played_game['hoursPlayed'].to_f
           end
@@ -311,8 +312,8 @@ class SteamId
   # @see #friends
   # @see #initialize
   def fetch_friends
-    @friends = []
     friends_data = parse "#{base_url}/friends?xml=1"
+    @friends = []
     friends_data['friends']['friend'].each do |friend|
       @friends << SteamId.new(friend.to_i, false)
     end
@@ -326,16 +327,17 @@ class SteamId
   #
   # @see #games
   def fetch_games
+    games_data = parse "#{base_url}/games?xml=1"
     @games     = {}
     @playtimes = {}
-    games_data = parse "#{base_url}/games?xml=1"
-    [games_data['games']['game']].flatten.each do |game_data|
+    games_data['games']['game'].each do |game_data|
       app_id = game_data['appID'].to_i
       game = SteamGame.new app_id, game_data
       @games[app_id] = game
 
       recent = game_data['hoursLast2Weeks'].to_f
-      total = game_data['hoursOnRecord'].to_f
+      total = (game_data['hoursOnRecord'] || '').delete(',').to_f
+
       @playtimes[app_id] = [(recent * 60).to_i, (total * 60).to_i]
     end
 
@@ -480,7 +482,7 @@ class SteamId
   #        game with the given ID exists
   # @return [SteamGame] The game found with the given ID
   def find_game(id)
-    if id.is_a? Integer
+    if id.is_a? Numeric
       game = games[id]
     else
       game = games.values.find do |game|

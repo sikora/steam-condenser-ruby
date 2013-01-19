@@ -51,7 +51,7 @@ class TestSourceServer < Test::Unit::TestCase
 
         packet.is_a? RCONAuthRequest
       end
-      rcon_socket.expects(:reply).twice.returns(nil).returns(reply)
+      rcon_socket.expects(:reply).twice.returns(mock).returns(reply)
       @server.instance_variable_set :@rcon_socket, rcon_socket
 
       assert @server.rcon_auth 'password'
@@ -64,7 +64,7 @@ class TestSourceServer < Test::Unit::TestCase
 
       rcon_socket = mock
       rcon_socket.expects(:send).with { |packet| packet.is_a? RCONAuthRequest }
-      rcon_socket.expects(:reply).twice.returns(nil).returns(reply)
+      rcon_socket.expects(:reply).twice.returns(mock).returns(reply)
       @server.instance_variable_set :@rcon_socket, rcon_socket
 
       assert_not @server.rcon_auth 'password'
@@ -75,6 +75,14 @@ class TestSourceServer < Test::Unit::TestCase
       assert_raises RCONNoAuthError do
         @server.rcon_exec 'command'
       end
+    end
+
+    should 'close the RCON socket on disconnect' do
+      rcon_socket = mock
+      rcon_socket.expects(:close)
+      @server.instance_variable_set :@rcon_socket, rcon_socket
+
+      @server.disconnect
     end
 
     context 'with an authenticated RCON connection' do
