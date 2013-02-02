@@ -17,7 +17,7 @@ module XMLData
   # @param [String] url The URL to parse
   # @return [Hash<String, Object>] The data parsed from the XML document
   def parse(url)
-    data = open(url, { :proxy => true })
+    data = open(url, { :proxy => false })
     @xml_data = MultiXml.parse(data).values.first
   end
 
